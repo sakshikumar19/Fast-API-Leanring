@@ -1,0 +1,28 @@
+Each instance of postgres can be carved out into multiple separate databases.
+So tow db - db1 and db2 can be totally unrelated but be an instance of your postgres database.
+
+((GPT Explanation: ))
+In PostgreSQL, an instance refers to a running PostgreSQL server process that manages a collection of databases. 
+Each instance of PostgreSQL can host multiple databases, and these databases are isolated from each other. 
+This means that databases within the same PostgreSQL instance can be completely unrelated, both in terms of data and schema, while being managed by the same server process.
+
+Benefits of Multiple Databases in a Single Instance
+Resource Management:
+One PostgreSQL instance can manage resources such as memory and CPU for multiple databases, which can be more efficient than running separate instances for each database.
+Simplified Management:
+Managing a single instance with multiple databases can be simpler in terms of configuration, backups, and maintenance compared to managing multiple instances.
+Isolation:
+Each database can be isolated in terms of access control. Users can be granted permissions to specific databases without affecting others.
+Cost Efficiency:
+Running a single PostgreSQL instance for multiple databases can be more cost-effective in terms of server resources and administrative overhead.
+
+Postgres creates a default database called 'postgres'
+This is so that when you need to connect to the dbms, you need to mandatorily connect to a database
+
+pg-admin is a goey which helps you interact with postgres without a lot of sql commands
+however, if interested, go to the sql tab and see how the creation happens
+
+psql is best as you shouldn't waste time using a using
+
+Use sqlalchemy == 1.4.52, not 2.0 because that does not have long term support!
+

@@ -1,0 +1,41 @@
+conda activate api
+pip install fastapi[all] -- for not having to install manual dependencies
+pip freeze (to show all installed packages)
+python -m uvicorn main:app (main is the file and app is the instance of fastapi
+                           note that --reload ensures that whenever you change your code and save, you don't have to restart the server)
+
+If your main files exists in a folder, which is treated as a python package, run this cmd to start server:
+python -m uvicorn app.main:app
+
+pip install psycopg2 (for postgres connection)
+
+pip install passlib[bcrypt] - for hashing passwords
+pip install python-jose[cryptography] - for signing JWT
+
+now if you have the authorization in place, before creating a post (or whatever endpoint needs authorization), go to headers and add:
+Key: Authorization, Value: Bearer <token_generated_while_logging_in>
+
+Use Postman Environments feature to ensure that your application works on all kinds of servers/protocols you want!
+(instead of hard coding those variables based off on local system)
+
+Now it is a pain to login, copy-paste and test the api everytime the token expires.
+1. To solve this, you can go to scripts in the login endpoint on postman
+2. Add this command: pm.environment.set("JWT",pm.response.json().access_token);
+3. Go to each endpoint to be tested and add {{JWT}} as value for 'Token' key in Authorization
+4. This dynamically updates the token
+5. So each time the token expires, all you need to do is login
+
+One-to-Many relationship: user can create many posts but a post can be associated with only one user.
+Foreign key solves the relational problem (hence, R-DBMS)
+Your foreign key datatype MUST match the reference table datatype
+Name of foreign key doesn't matter but the convention is: <our-table>_<reference-table>_fkey
+Eg: posts_users_fkey
+Code to do this through psql: ALTER TABLE posts ADD COLUMN user_id integer NOT NULL;
+ALTER TABLE posts ADD CONSTRAINT posts_user_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+One delete cascade means if a user is deleted, the associated posts also get deleted.
+
+But if you are using sqlalchemy (orm), do it through it only, just for continuity.
+
+Code: \d posts; (for table description)
+
+
