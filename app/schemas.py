@@ -1,7 +1,8 @@
 from datetime import datetime
+from re import I
 from typing import Optional
 from pydantic import BaseModel, EmailStr
-
+from pydantic.types import conint
 # you need a schema for everything
 # eg: you may not want the user to be allowed to update every field
 
@@ -55,3 +56,9 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     id: Optional[int] = None
     
+class Vote(BaseModel):
+    post_id: int
+    dir: conint(le=1)
+# dir is the direction of vote (either 1 or 0 to like or unlike (not dislike, that would need another class))
+# conint is like a validator to ensure that user input is less than or equal to 1
+# the issue is it allows -ve values as well but we can sort that out later

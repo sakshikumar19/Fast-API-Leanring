@@ -39,3 +39,35 @@ But if you are using sqlalchemy (orm), do it through it only, just for continuit
 Code: \d posts; (for table description)
 
 
+About environment variables:
+Either you can set it up in your OS or create a env file
+
+To do in OS (not recommended at all):
+
+Add an env variable --> create a file.py and add code: 
+import os
+path = os.getenv("MY_DB_URL")
+
+
+COMPOSITE KEY: primary key of 2 cols. Here the condition is not null and unique for the composite row!  
+
+SQL JOINS (checkout Postgres tutorials site for excellent explanation)
+Code: SELECT title, content, email FROM posts LEFT JOIN users ON posts.owner_id = users.id;
+(if the tables have a common column name (eg: id) & you want to retrieve the one from users, say users.id)
+eg: SELECT users.id, posts.* FROM posts LEFT JOIN users ON posts.owner_id = users.id;
+(posts.* retreives all cols from posts)
+Retrieves all cols: SELECT * FROM posts LEFT JOIN users ON posts.owner_id = users.id;
+
+1st table referenced in code line: LEFT TABLE (here, posts)
+2nd table: RIGHT TABLE
+
+Types of joins:
+1. An INNER JOIN returns only the rows where there is a match in both tables. If there is no match, the row is not returned.
+2. A LEFT JOIN returns all the rows from the left table and the matched rows from the right table. If there is no match, the result is NULL on the side of the right table.
+3. A RIGHT JOIN returns all the rows from the right table and the matched rows from the left table. If there is no match, the result is NULL on the side of the left table.
+4. A FULL JOIN returns all the rows when there is a match in either the left table or the right table. If there is no match, the result is NULL from the side that does not have a match.
+5. A CROSS JOIN returns the Cartesian product of the two tables. This means that it returns all possible combinations of rows from the two tables.
+6. A SELF JOIN is a regular join but the table is joined with itself. It is useful for comparing rows within the same table.
+
+
+

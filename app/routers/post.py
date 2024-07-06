@@ -2,7 +2,7 @@ from fastapi import Response, status, HTTPException, Depends, APIRouter
 from .. import models, schemas, oauth2
 from sqlalchemy.orm import Session
 from ..database import get_db
-from typing import List
+from typing import List, Optional
 
 router =APIRouter(
     prefix='/posts',
@@ -14,10 +14,18 @@ router =APIRouter(
     
 @router.get("/", response_model=List[schemas.PostResponse]) # get is for retrieving data
 # List is specifying that the pydantic model acts on a list of posts
-def get_posts(db: Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)):
+def get_posts(db: Session = Depends(get_db), current_user = Depends(oauth2.get_current_user), Limit: int = 10, skip: int = 0, search: Optional[str] = ""): 
+    # Limit is the query parameter for filtering results, here it means get 10 posts as default
+    # This skips the first skip number of posts.
+    # skip helps in pagination!
+    # search just requires keywords matching
+    # to perform a search for keypharses, instead os space in URL, use -- %20
+    # {{URL}}/posts/limit=7&skip=2&search=xyz%20abc
+    # {{URL}}/posts/skip=2&search=xyz -- limit set to default
+    
     # cursor.execute("""SELECT * FROM public.posts""")
     # posts=cursor.fetchall()
-    posts = db.query(models.Post).all()
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(Limit).offset(skip).all()
     return posts #fastapi automatically serializes the dict (into json)
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse) #because fastapi generally ends up sending 200 which is not appropriate
