@@ -12,6 +12,8 @@ pip install psycopg2 (for postgres connection)
 pip install passlib[bcrypt] - for hashing passwords
 pip install python-jose[cryptography] - for signing JWT
 
+pip install alembic
+
 now if you have the authorization in place, before creating a post (or whatever endpoint needs authorization), go to headers and add:
 Key: Authorization, Value: Bearer <token_generated_while_logging_in>
 

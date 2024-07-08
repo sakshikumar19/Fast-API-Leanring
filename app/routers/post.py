@@ -1,4 +1,5 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
+from sqlalchemy import func
 from .. import models, schemas, oauth2
 from sqlalchemy.orm import Session
 from ..database import get_db
@@ -12,7 +13,8 @@ router =APIRouter(
 # prefeix ensures you don't need to repeat the same route url everywhere
 # ensure that all the decorators start with your prefix and remmove it
     
-@router.get("/", response_model=List[schemas.PostResponse]) # get is for retrieving data
+# @router.get("/", response_model=List[schemas.PostResponse]) # get is for retrieving data
+@router.get("/", response_model=List[schemas.PostOut])
 # List is specifying that the pydantic model acts on a list of posts
 def get_posts(db: Session = Depends(get_db), current_user = Depends(oauth2.get_current_user), Limit: int = 10, skip: int = 0, search: Optional[str] = ""): 
     # Limit is the query parameter for filtering results, here it means get 10 posts as default
@@ -25,8 +27,14 @@ def get_posts(db: Session = Depends(get_db), current_user = Depends(oauth2.get_c
     
     # cursor.execute("""SELECT * FROM public.posts""")
     # posts=cursor.fetchall()
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(Limit).offset(skip).all()
-    return posts #fastapi automatically serializes the dict (into json)
+    
+    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(Limit).offset(skip).all()
+    
+    # the below code is for joins so that we can count votes on each post
+    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(Limit).offset(skip).all()
+    # sqlaclchemy has default of inner joins unline psql. So we have to specify that!
+    
+    return results #fastapi automatically serializes the dict (into json)
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse) #because fastapi generally ends up sending 200 which is not appropriate
 # response_model uses schema deciding what info to send to the user
@@ -50,14 +58,14 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db), current
     return new_post
 
 
-@router.get("/{id}", response_model=schemas.PostResponse) # id is the path parameter
+@router.get("/{id}", response_model=schemas.PostOut) # id is the path parameter
 def get_post(id: int, response: Response, db: Session = Depends(get_db), current_user = Depends(oauth2.get_current_user)): #converts to int as json always serializes data
     # cursor.execute("""SELECT * FROM posts WHERE id = %s""",(str(id),)) # convert to str to remove potential issues
     # # the comma is quite important, dk why
     # post = cursor.fetchone()
 
-    post = db.query(models.Post).filter(models.Post.id == id).first() # instead of all() cuz we know only one post can have that id
-    
+    # post = db.query(models.Post).filter(models.Post.id == id).first() # instead of all() cuz we know only one post can have that id
+    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with ID {id} was not found")
     return post

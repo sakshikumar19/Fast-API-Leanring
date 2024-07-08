@@ -24,7 +24,15 @@ class PostBase(BaseModel):
     content:str
     published:bool = True
     owner: UserOut # this is the user object created using sqlalchemy relationship
+
+class PostOut(BaseModel):
+    Post: PostBase
+    votes: int
     
+    class config:
+        from_attributes = True
+    
+
 class PostCreate(PostBase):
     pass # inheritance
 

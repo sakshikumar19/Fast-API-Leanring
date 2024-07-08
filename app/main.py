@@ -4,7 +4,9 @@ from .routers import post,user,auth, vote
 from . import models
 
 # use the bcrypt hashing algo for passwords
-models.Base.metadata.create_all(bind=engine)
+
+# models.Base.metadata.create_all(bind=engine)
+# the above command is needed to create tables if you don't use alembic. Right now, we have it in place.
 
 app=FastAPI()
 
