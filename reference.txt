@@ -73,3 +73,20 @@ Types of joins:
 
 
 
+Note about Postman: It sends requests from your own computer. So you cannot handle edge cases where requests are sent from another device or web browser.
+Eg: if you send an API request to our API from google.com like this:
+> go to dev tools -> console
+> fetch("http://ocalhost:8000/").then(res => res.json()).then(console.log)
+VM835:1 Mixed Content: The page at 'https://www.google.com/' was loaded over HTTPS, but requested an insecure resource 'http://ocalhost:8000/'. This request has been blocked; the content must be served over HTTPS.
+(anonymous) @ VM835:1Understand this error
+Promise {<pending>}
+This error is due to the CORS policy (Cross Origin Resource Sharing)
+
+Basically any reuqest from a different domain name will be blocked (eg: ebay.com cannot access google.com)
+
+
+
+requirements.txt : to add all packages installed in the virtual env: pip freeze > requirements.txt
+
+To download from this file: pip install -r requirements.txt
+

@@ -39,3 +39,5 @@ while True:
     except Exception as error:
         print("connection failed: error=",error)
         time.sleep(2)
+# infinite loop if connection fails
+# use try-except if there is a chance of some part of code to fail!
